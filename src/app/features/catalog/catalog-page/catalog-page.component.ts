@@ -2,8 +2,10 @@ import { Component, signal, computed } from '@angular/core';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { TabsComponent, Tab } from '../../../shared/components/tabs/tabs.component';
 import { FoodCardComponent } from '../food-card/food-card.component';
-import { MoodSurveyModalComponent } from '../../survey/mood-survey-modal/mood-survey-modal.component';
-import { ProfileSurveyModalComponent } from '../../survey/profile-survey-modal/profile-survey-modal.component';
+import {
+  MoodSurveyModalComponent,
+  ProfileSurveyModalComponent,
+} from '../../survey/survey-modal.component';
 import type { FoodItem } from '../../../shared/models/food-item.model';
 import type { MoodSurvey, ProfileSurvey } from '../../../shared/models/survey.model';
 
