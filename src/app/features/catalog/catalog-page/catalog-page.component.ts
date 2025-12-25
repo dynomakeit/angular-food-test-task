@@ -68,7 +68,7 @@ import type { MoodSurvey, ProfileSurvey } from '../../../shared/models/survey.mo
 export class CatalogPageComponent {
   readonly address = signal('Новосибирская улица, 100');
   readonly activeCategory = signal('popular');
-  readonly isMoodSurveyOpen = signal(false);
+  readonly isMoodSurveyOpen = signal(true);
   readonly isProfileSurveyOpen = signal(false);
 
   readonly categories: Tab[] = [
