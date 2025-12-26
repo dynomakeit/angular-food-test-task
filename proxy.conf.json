@@ -3,6 +3,6 @@
     "target": "https://api.atera.space",
     "secure": true,
     "changeOrigin": true,
-    "logLevel": "debug"
+    "cookieDomainRewrite": "localhost"
   }
 }

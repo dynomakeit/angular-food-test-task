@@ -1,4 +1,4 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, input, output, signal, computed } from '@angular/core';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
 import {
   SelectButtonGroupComponent,
@@ -44,6 +44,7 @@ import type { MoodSurvey, ProfileSurvey } from '../../shared/models/survey.model
         <app-button
           variant="primary"
           [fullWidth]="true"
+          [disabled]="!isFormValid()"
           (onClick)="submitSurvey()"
         >
           Продолжить
@@ -60,6 +61,12 @@ export class MoodSurveyModalComponent {
   readonly selectedMood = signal<string | null>(null);
   readonly selectedHunger = signal<string | null>(null);
   readonly selectedExperiment = signal<string | null>(null);
+
+  readonly isFormValid = computed(() =>
+    this.selectedMood() !== null &&
+    this.selectedHunger() !== null &&
+    this.selectedExperiment() !== null
+  );
 
   readonly moodOptions: SelectOption[] = [
     { value: 'joy', label: 'Радость' },
@@ -127,6 +134,7 @@ export class MoodSurveyModalComponent {
         <app-button
           variant="primary"
           [fullWidth]="true"
+          [disabled]="!isFormValid()"
           (onClick)="submitSurvey()"
         >
           Продолжить
@@ -143,6 +151,12 @@ export class ProfileSurveyModalComponent {
   readonly selectedGender = signal<string | null>(null);
   readonly selectedAge = signal<string | null>(null);
   readonly selectedDiet = signal<string | null>(null);
+
+  readonly isFormValid = computed(() =>
+    this.selectedGender() !== null &&
+    this.selectedAge() !== null &&
+    this.selectedDiet() !== null
+  );
 
   readonly genderOptions: SelectOption[] = [
     { value: 'male', label: 'Мужчина' },

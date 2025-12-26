@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { HeaderComponent } from '../../../shared/components/header/header.component';
 import { TabsComponent, Tab } from '../../../shared/components/tabs/tabs.component';
 import { FoodCardComponent } from '../food-card/food-card.component';
@@ -6,6 +6,7 @@ import {
   MoodSurveyModalComponent,
   ProfileSurveyModalComponent,
 } from '../../survey/survey-modal.component';
+import { QuestionnaireService } from '../../../core/services/questionnaire.service';
 import type { FoodItem } from '../../../shared/models/food-item.model';
 import type { MoodSurvey, ProfileSurvey } from '../../../shared/models/survey.model';
 
@@ -68,10 +69,14 @@ import type { MoodSurvey, ProfileSurvey } from '../../../shared/models/survey.mo
   `,
 })
 export class CatalogPageComponent {
+  private readonly questionnaireService = inject(QuestionnaireService);
+
   readonly address = signal('Новосибирская улица, 100');
   readonly activeCategory = signal('popular');
   readonly isMoodSurveyOpen = signal(true);
   readonly isProfileSurveyOpen = signal(false);
+
+  private moodSurveyData: MoodSurvey | null = null;
 
   readonly categories: Tab[] = [
     { id: 'salads', label: 'Салаты' },
@@ -86,7 +91,7 @@ export class CatalogPageComponent {
       name: 'Борщ со сметаной',
       price: 650,
       weight: 340,
-      imageUrl: 'https://images.unsplash.com/photo-1603903631918-90e83e9b9e3a?w=400&h=300&fit=crop',
+      imageUrl: 'https://example.com/borsh.jpg',
       category: 'popular',
     },
     {
@@ -94,73 +99,10 @@ export class CatalogPageComponent {
       name: 'Паста',
       price: 650,
       weight: 340,
-      imageUrl: 'https://images.unsplash.com/photo-1603903631918-90e83e9b9e3a?w=400&h=300&fit=crop',
+      imageUrl: 'https://example.com/pasta.jpg',
       category: 'popular',
     },
-    {
-      id: '3',
-      name: 'Борщ со сметаной',
-      price: 650,
-      weight: 340,
-      imageUrl: 'https://images.unsplash.com/photo-1603903631918-90e83e9b9e3a?w=400&h=300&fit=crop',
-      category: 'popular',
-    },
-    {
-      id: '4',
-      name: 'Паста',
-      price: 650,
-      weight: 340,
-      imageUrl: 'https://images.unsplash.com/photo-1603903631918-90e83e9b9e3a?w=400&h=300&fit=crop',
-      category: 'popular',
-    },
-    {
-      id: '5',
-      name: 'Цезарь',
-      price: 550,
-      weight: 280,
-      imageUrl: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400&h=300&fit=crop',
-      category: 'salads',
-    },
-    {
-      id: '6',
-      name: 'Греческий салат',
-      price: 480,
-      weight: 250,
-      imageUrl: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop',
-      category: 'salads',
-    },
-    {
-      id: '7',
-      name: 'Пепперони',
-      price: 890,
-      weight: 450,
-      imageUrl: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&h=300&fit=crop',
-      category: 'pizza',
-    },
-    {
-      id: '8',
-      name: 'Маргарита',
-      price: 750,
-      weight: 400,
-      imageUrl: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400&h=300&fit=crop',
-      category: 'pizza',
-    },
-    {
-      id: '9',
-      name: 'Карбонара',
-      price: 720,
-      weight: 320,
-      imageUrl: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400&h=300&fit=crop',
-      category: 'pasta',
-    },
-    {
-      id: '10',
-      name: 'Болоньезе',
-      price: 680,
-      weight: 350,
-      imageUrl: 'https://images.unsplash.com/photo-1551892374-ecf8754cf8b0?w=400&h=300&fit=crop',
-      category: 'pasta',
-    },
+
   ]);
 
   readonly filteredItems = computed(() =>
@@ -188,12 +130,8 @@ export class CatalogPageComponent {
   }
 
   onMoodSurveySubmit(survey: MoodSurvey): void {
-    console.log('Mood survey submitted:', survey);
+    this.moodSurveyData = survey;
     this.isMoodSurveyOpen.set(false);
-    this.isProfileSurveyOpen.set(true);
-  }
-
-  openProfileSurvey(): void {
     this.isProfileSurveyOpen.set(true);
   }
 
@@ -202,7 +140,17 @@ export class CatalogPageComponent {
   }
 
   onProfileSurveySubmit(survey: ProfileSurvey): void {
-    console.log('Profile survey submitted:', survey);
-    this.isProfileSurveyOpen.set(false);
+    if (!this.moodSurveyData) return;
+
+    this.questionnaireService.submit(this.moodSurveyData, survey).subscribe({
+      next: () => {
+        console.log('Questionnaire submitted successfully');
+        this.isProfileSurveyOpen.set(false);
+        this.moodSurveyData = null;
+      },
+      error: (err) => {
+        console.error('Failed to submit questionnaire:', err);
+      },
+    });
   }
 }
